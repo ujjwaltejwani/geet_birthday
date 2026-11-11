@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Sister! 🎂✨</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Fredoka:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #fff0f5 0%, #ffe4e1 50%, #f0f8ff 100%);
+            min-height: 100vh;
+        }
+
+        .font-handwriting {
+            font-family: 'Caveat', cursive;
+        }
+
+        .font-playful {
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        /* Floating particles CSS */
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            animation: float 6s ease-in-out infinite;
+            opacity: 0.7;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* 3D Envelope Styles */
+        .envelope-wrapper {
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .envelope {
+            position: relative;
+            width: 320px;
+            height: 220px;
+            background-color: #ff85a2;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            box-shadow: 0 15px 35px rgba(255, 105, 180, 0.3);
+            transition: transform 0.6s ease;
+        }
+
+        @media (min-width: 640px) {
+            .envelope {
+                width: 440px;
+                height: 280px;
+            }
+        }
+
+        .envelope::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 160px solid transparent;
+            border-right: 160px solid transparent;
+            border-top: 120px solid #ff6289;
+            transform-origin: top;
+            transition: transform 0.6s 0.4s ease, z-index 0.2s 0.4s ease;
+            z-index: 5;
+        }
+
+        @media (min-width: 640px) {
+            .envelope::before {
+                border-left-width: 220px;
+                border-right-width: 220px;
+                border-top-width: 150px;
+            }
+        }
+
+        .envelope.open::before {
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+
+        .envelope-pocket {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 160px solid #ff7597;
+            border-right: 160px solid #ff7597;
+            border-bottom: 120px solid #ff527b;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            z-index: 4;
+        }
+
+        @media (min-width: 640px) {
+            .envelope-pocket {
+                border-left-width: 220px;
+                border-right-width: 220px;
+                border-bottom-width: 150px;
+            }
+        }
+
+        .letter {
+            position: absolute;
+            bottom: 10px;
+            left: 5%;
+            width: 90%;
+            height: 85%;
+            background: #fffdfa;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.6s ease, opacity 0.4s ease;
+            z-index: 3;
+            overflow-y: auto;
+        }
+
+        .envelope.open .letter {
+            transform: translateY(-120px);
+            z-index: 6;
+        }
+
+        @media (min-width: 640px) {
+            .envelope.open .letter {
+                transform: translateY(-160px);
+            }
+        }
+
+        /* Candle Flame Animation */
+        .flame {
+            width: 12px;
+            height: 20px;
+            background: linear-gradient(to bottom, #fff, #ffaa00, #ff4500);
+            border-radius: 50% 50% 35% 35%;
+            animation: flicker 0.6s infinite alternate;
+            box-shadow: 0 0 12px #ffaa00, 0 0 20px #ff4500;
+        }
+
+        @keyframes flicker {
+            0% { transform: scale(1) rotate(-2deg); }
+            100% { transform: scale(1.15) rotate(2deg); opacity: 0.9; }
+        }
+
+        /* Knife Slice Dragging */
+        .knife-cursor {
+            cursor: grab;
+            user-select: none;
+            touch-action: none;
+        }
+        .knife-cursor:active {
+            cursor: grabbing;
+        }
+
+        /* Polaroid Hover Effect */
+        .polaroid {
+            background: white;
+            padding: 12px 12px 24px 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .polaroid:hover {
+            transform: translateY(-8deg) rotate(0deg) !important;
+            box-shadow: 0 20px 30px -10px rgba(255, 105, 180, 0.3);
+        }
+
+        /* Glow effects */
+        .glow-pink {
+            box-shadow: 0 0 25px rgba(255, 105, 180, 0.5);
+        }
+
+        /* Custom Scrollbar for letter */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #ffe4e1;
+            border-radius: 10px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #ff85a2;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="relative flex flex-col min-h-screen text-slate-800">
+
+    <!-- Floating Sparkles & Hearts Container -->
+    <div id="particles-container" class="fixed inset-0 pointer-events-none z-0"></div>
+
+    <!-- Audio Control Button -->
+    <button id="bgm-toggle" class="fixed top-4 right-4 z-50 bg-white/80 backdrop-blur-md p-3 rounded-full shadow-lg hover:scale-110 active:scale-95 transition-all text-pink-500 border border-pink-200" title="Toggle Birthday Melody">
+        <i id="bgm-icon" class="fas fa-music text-xl"></i>
+    </button>
+
+    <!-- MAIN APP CONTAINER -->
+    <main class="relative z-10 flex-grow flex flex-col justify-center items-center p-4">
+
+        <!-- ================= PAGE 1: HEARTFELT LETTER ================= -->
+        <section id="page-1" class="w-full max-w-4xl flex flex-col items-center justify-center min-h-[85vh] transition-all duration-700">
+
+            <!-- Page Header -->
+            <div class="text-center mb-8 animate-bounce-short">
+                <span class="inline-block bg-pink-100 text-pink-600 px-4 py-1.5 rounded-full text-sm font-semibold tracking-wide uppercase mb-3 shadow-sm border border-pink-200">
+                    <i class="fas fa-heart mr-1.5 text-pink-500"></i> A Special Delivery
+                </span>
+                <h1 class="text-3xl md:text-5xl font-extrabold text-slate-800 font-playful tracking-tight">
+                    Happy Birthday, Dear Sister! 🎉
+                </h1>
+                <p class="text-slate-600 mt-2 text-sm md:text-base font-medium">
+                    Tap the envelope below to open your cousin brother's special message! 💌
+                </p>
+            </div>
+
+            <!-- Interactive Envelope Card -->
+            <div class="my-6 my-md-10 flex flex-col items-center">
+                <div id="envelope-wrapper" class="envelope-wrapper" onclick="toggleLetter()">
+                    <div id="envelope" class="envelope flex justify-center items-center">
+                        <div class="text-white text-center z-10 pointer-events-none transition-opacity duration-300" id="envelope-seal">
+                            <div class="w-14 h-14 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-2 border border-white/40 shadow-inner">
+                                <i class="fas fa-envelope-open-text text-2xl text-white"></i>
+                            </div>
+                            <span class="font-playful text-sm font-semibold tracking-wider uppercase">Click to Open</span>
+                        </div>
+
+                        <!-- Inside Letter -->
+                        <div class="letter custom-scroll text-left" id="letter-content" onclick="event.stopPropagation()">
+                            <div class="border-b-2 border-dashed border-pink-200 pb-3 mb-3 flex justify-between items-center">
+                                <h3 class="font-playful font-bold text-xl text-pink-600">From Cousin Brother 👦🏻💬</h3>
+                                <span class="text-xs text-pink-400 font-medium"><i class="far fa-calendar-alt mr-1"></i> Today</span>
+                            </div>
+
+                            <div class="font-handwriting text-2xl md:text-3xl text-slate-700 leading-snug space-y-4">
+                                <p>Meri Pyaari Behen ❤️,</p>
+                                <p>
+                                    Wishing you the happiest, most amazing birthday ever! 🎂✨ From all our childhood fights over small things to sharing secret jokes and crazy memories, having you as my sister is one of the best gifts in life.
+                                </p>
+                                <p>
+                                    May this year bring you unlimited happiness, success in everything you do, and endless laughter! Always keep smiling because you truly deserve all the joy in the world.
+                                </p>
+                                <p class="text-right font-bold text-pink-600 mt-4">
+                                    — Forever your annoying yet protective brother (Ujjwal)! 👊⭐
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Envelope Pocket -->
+                        <div class="envelope-pocket"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Letter Expanded Modal Style Preview (For Mobile Ease) -->
+            <div id="modal-letter" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative border-2 border-pink-200 max-h-[85vh] flex flex-col">
+                    <button onclick="closeLetterModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-2 text-xl">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="border-b border-pink-100 pb-3 mb-4 flex items-center gap-2">
+                        <span class="text-2xl">💌</span>
+                        <h3 class="font-playful font-bold text-2xl text-pink-600">Cousin Brother's Birthday Letter</h3>
+                    </div>
+                    <div class="overflow-y-auto custom-scroll pr-2 font-handwriting text-2xl md:text-3xl text-slate-700 leading-relaxed space-y-4">
+                        <p>Meri Pyaari Behen ❤️,</p>
+                        <p>
+                            Wishing you the happiest, most amazing birthday ever! 🎂✨ From all our childhood fights over small things to sharing secret jokes and crazy memories, having you as my sister is one of the best gifts in life.
+                        </p>
+                        <p>
+                            May this year bring you unlimited happiness, success in everything you do, and endless laughter! Always keep smiling because you truly deserve all the joy in the world.
+                        </p>
+                        <p class="text-right font-bold text-pink-600 mt-6">
+                            — Forever your annoying yet protective brother (Ujjwal)! 👊⭐
+                        </p>
+                    </div>
+                    <button onclick="closeLetterModal()" class="mt-6 w-full py-3 bg-pink-500 hover:bg-pink-600 text-white font-semibold rounded-xl transition shadow-md">
+                        Close Letter ❤️
+                    </button>
+                </div>
+            </div>
+
+            <!-- Action Button to Page 2 -->
+            <div class="mt-8 text-center">
+                <button onclick="goToPage2()" class="group relative inline-flex items-center gap-3 bg-gradient-to-r from-pink-500 via-rose-500 to-purple-500 text-white font-playful font-bold text-lg md:text-xl px-8 py-4 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300">
+                    <span>Next Stop: Party Time 🎂</span>
+                    <i class="fas fa-arrow-right group-hover:translate-x-1.5 transition-transform"></i>
+                </button>
+            </div>
+        </section>
+
+
+        <!-- ================= PAGE 2: CAKE CUTTING & WISHES ZONE ================= -->
+        <section id="page-2" class="hidden w-full max-w-5xl flex-col items-center justify-center min-h-[85vh] py-6 transition-all duration-700">
+
+            <!-- Header -->
+            <div class="text-center mb-6">
+                <span class="bg-amber-100 text-amber-700 px-4 py-1.5 rounded-full text-xs md:text-sm font-semibold tracking-wide uppercase shadow-sm border border-amber-200">
+                    <i class="fas fa-glass-cheers mr-1"></i> Celebration Zone
+                </span>
+                <h2 class="text-3xl md:text-5xl font-extrabold text-slate-800 font-playful mt-2">
+                    Let's Cut The Birthday Cake! 🍰
+                </h2>
+                <p class="text-slate-600 text-sm md:text-base mt-1">
+                    Tap on the knife and swipe across the cake to cut a slice! 🎉
+                </p>
+            </div>
+
+            <!-- CAKE & KNIFE CONTAINER -->
+            <div class="relative w-full max-w-md my-4 flex flex-col items-center justify-center bg-white/60 backdrop-blur-md rounded-3xl p-6 border border-white/80 shadow-xl">
+
+                <!-- Cake Stage -->
+                <div class="relative flex flex-col items-center justify-end h-64 w-full">
+
+                    <!-- Candles Row -->
+                    <div class="flex justify-center gap-6 z-20 mb-[-6px]">
+                        <!-- Candle 1 -->
+                        <div class="flex flex-col items-center">
+                            <div class="flame" id="flame-1"></div>
+                            <div class="w-2.5 h-10 bg-gradient-to-b from-yellow-300 via-pink-400 to-purple-400 rounded-sm shadow-sm"></div>
+                        </div>
+                        <!-- Candle 2 -->
+                        <div class="flex flex-col items-center">
+                            <div class="flame" id="flame-2"></div>
+                            <div class="w-2.5 h-12 bg-gradient-to-b from-blue-300 via-teal-400 to-indigo-400 rounded-sm shadow-sm"></div>
+                        </div>
+                        <!-- Candle 3 -->
+                        <div class="flex flex-col items-center">
+                            <div class="flame" id="flame-3"></div>
+                            <div class="w-2.5 h-10 bg-gradient-to-b from-purple-300 via-pink-400 to-red-400 rounded-sm shadow-sm"></div>
+                        </div>
+                    </div>
+
+                    <!-- Tier 1 (Top Layer) -->
+                    <div id="cake-top" class="relative w-40 h-20 bg-gradient-to-r from-pink-300 via-pink-200 to-pink-300 rounded-t-3xl border-b-4 border-pink-400/30 flex items-center justify-center shadow-md overflow-hidden transition-all duration-500">
+                        <!-- Cream Drips -->
+                        <div class="absolute top-0 inset-x-0 h-4 bg-white/90 rounded-b-xl flex justify-around">
+                            <div class="w-3 h-3 bg-white rounded-full mt-2"></div>
+                            <div class="w-4 h-4 bg-white rounded-full mt-1"></div>
+                            <div class="w-3 h-3 bg-white rounded-full mt-2"></div>
+                        </div>
+                        <!-- Sprinkles -->
+                        <div class="flex gap-2">
+                            <span class="w-2 h-2 rounded-full bg-yellow-400 animate-ping"></span>
+                            <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                            <span class="w-2 h-2 rounded-full bg-rose-400"></span>
+                        </div>
+                    </div>
+
+                    <!-- Tier 2 (Bottom Layer) -->
+                    <div id="cake-bottom" class="relative w-60 h-24 bg-gradient-to-r from-purple-300 via-rose-200 to-purple-300 rounded-t-2xl border-b-8 border-purple-400/40 flex items-center justify-center shadow-lg overflow-hidden transition-all duration-500">
+                        <!-- Frosting Pattern -->
+                        <div class="absolute top-0 inset-x-0 h-5 bg-white/80 rounded-b-2xl"></div>
+                        <div class="flex gap-3 mt-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-pink-500"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-teal-400"></span>
+                        </div>
+                    </div>
+
+                    <!-- Cake Stand -->
+                    <div class="w-72 h-4 bg-slate-200 rounded-full shadow-md border-b-2 border-slate-300"></div>
+                    <div class="w-36 h-3 bg-slate-300/80 rounded-b-xl"></div>
+                </div>
+
+                <!-- Slice Line Effect -->
+                <div id="cake-cut-line" class="hidden absolute top-12 bottom-12 w-1 bg-white shadow-[0_0_10px_#fff] z-30 animate-pulse"></div>
+
+                <!-- Draggable Knife Element -->
+                <div id="knife" class="knife-cursor absolute top-4 right-4 z-40 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border border-pink-200 flex items-center gap-2 hover:scale-105 active:scale-95 transition-transform" onclick="triggerCakeCut()">
+                    <span class="text-2xl transform -rotate-45 inline-block">🔪</span>
+                    <span class="font-playful font-bold text-xs text-pink-600 uppercase tracking-wider">Tap to Cut Cake</span>
+                </div>
+
+                <!-- Cut Success Message -->
+                <div id="cut-status" class="hidden mt-4 text-center">
+                    <span class="inline-block bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full animate-bounce">
+                        🎉 YAY! Cake Cut Successfully!
+                    </span>
+                </div>
+            </div>
+
+
+            <!-- WISHES SECTION (POLAROID CARDS) -->
+            <div class="w-full mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 px-2">
+
+                <!-- Brother's Polaroid Card -->
+                <div class="polaroid rounded-2xl transform -rotate-2">
+                    <div class="bg-pink-100/70 rounded-xl p-4 h-48 flex flex-col justify-between border border-pink-200">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-pink-600 tracking-wider uppercase"><i class="fas fa-heart text-pink-500"></i> Cousin Brother</span>
+                            <span class="text-xs text-slate-400">Wish #1</span>
+                        </div>
+                        <p class="font-handwriting text-2xl text-slate-700 leading-snug">
+                            "May your life always be filled with sweet moments, cute smiles, and big achievements! Keep Rocking, Geet!" 🌟✨
+                        </p>
+                        <div class="text-right">
+                            <span class="text-xs font-bold text-slate-500">— Ujjwal 👦🏻</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Your Wish Polaroid Card -->
+                <div class="polaroid rounded-2xl transform rotate-2">
+                    <div class="bg-purple-100/70 rounded-xl p-4 h-48 flex flex-col justify-between border border-purple-200">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-purple-600 tracking-wider uppercase"><i class="fas fa-star text-purple-500"></i> From brother's friend (also your brother)</span>
+                            <span class="text-xs text-slate-400">Wish #2</span>
+                        </div>
+                        <p class="font-handwriting text-2xl text-slate-700 leading-snug">
+                            "Happy Birthday, Geet! Live your life to the fullest and be happy!" 🥳🎈
+                        </p>
+                        <div class="text-right">
+                            <span class="text-xs font-bold text-slate-500">— Anmol 🌸</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- SECRET GIFT UNBOXING & BADGE -->
+            <div class="w-full mt-10 flex flex-col items-center">
+                <button id="unbox-btn" onclick="openGiftModal()" class="group bg-gradient-to-r from-amber-400 via-orange-400 to-pink-500 text-white font-playful font-bold text-lg px-8 py-4 rounded-2xl shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-3">
+                    <i class="fas fa-gift text-2xl group-hover:rotate-12 transition-transform"></i>
+                    <span>Unbox Secret Gift 🎁</span>
+                </button>
+            </div>
+
+            <!-- Back to Page 1 Button -->
+            <button onclick="goToPage1()" class="mt-8 text-slate-500 hover:text-pink-600 font-medium text-sm flex items-center gap-2 transition-colors">
+                <i class="fas fa-arrow-left"></i> Re-read Birthday Letter
+            </button>
+        </section>
+
+    </main>
+
+
+    <!-- ================= SECRET GIFT MODAL ================= -->
+    <div id="gift-modal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 text-center shadow-2xl relative border-4 border-amber-300 animate-scale-up">
+            <button onclick="closeGiftModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-2 text-xl">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl shadow-inner border-2 border-amber-300">
+                👑
+            </div>
+
+            <h3 class="font-playful font-extrabold text-2xl text-slate-800 mb-1">
+                Official Sister Award!
+            </h3>
+            <p class="text-xs text-amber-600 font-semibold tracking-widest uppercase mb-4">
+                Special Recognition
+            </p>
+
+            <!-- Crowned Sister Badge -->
+            <div class="bg-gradient-to-br from-amber-500 via-orange-400 to-pink-500 text-white rounded-2xl p-6 shadow-xl my-4 transform hover:scale-105 transition-transform">
+                <div class="text-5xl mb-2">🏆</div>
+                <h4 class="font-playful text-2xl font-bold tracking-wide">
+                    World's Best Sister
+                </h4>
+                <p class="text-xs text-amber-100 mt-1">
+                    Certified 100% Loving, Caring & Awesome!
+                </p>
+            </div>
+
+            <p class="text-slate-600 text-sm mt-3 font-medium">
+                "You bring light and joy to everyone around you. Never stop being your cheerful self!<br>And the website? Coded by your brother, Ujjwal!"
+            </p>
+
+            <button onclick="closeGiftModal()" class="mt-6 w-full py-3 bg-slate-800 hover:bg-slate-900 text-white font-playful font-bold rounded-xl transition shadow-lg">
+                Claim Badge & Celebrate! 🎉
+            </button>
+        </div>
+    </div>
+
+
+    <!-- ================= JAVASCRIPT LOGIC ================= -->
+    <script>
+        // Letter state toggle
+        let isLetterOpen = false;
+        let isCakeCut = false;
+        let audioContext = null;
+        let isPlayingMusic = false;
+
+        // Initialize Ambient Particles
+        function createParticles() {
+            const container = document.getElementById('particles-container');
+            const particleCount = 18;
+            const icons = ['✨', '💖', '🎈', '🌸', '⭐', '🎂'];
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle text-lg md:text-2xl';
+                particle.innerText = icons[Math.floor(Math.random() * icons.length)];
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
+                particle.style.animationDelay = (Math.random() * 5) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // Toggle Letter opening in Page 1
+        function toggleLetter() {
+            const envelope = document.getElementById('envelope');
+            const seal = document.getElementById('envelope-seal');
+
+            // Check if mobile screen (below 640px)
+            if (window.innerWidth < 640) {
+                document.getElementById('modal-letter').classList.remove('hidden');
+                return;
+            }
+
+            isLetterOpen = !isLetterOpen;
+            if (isLetterOpen) {
+                envelope.classList.add('open');
+                seal.style.opacity = '0';
+                triggerSoftConfetti();
+            } else {
+                envelope.classList.remove('open');
+                seal.style.opacity = '1';
+            }
+        }
+
+        function closeLetterModal() {
+            document.getElementById('modal-letter').classList.add('hidden');
+        }
+
+        // Page Navigation
+        function goToPage2() {
+            document.getElementById('page-1').classList.add('hidden');
+            const page2 = document.getElementById('page-2');
+            page2.classList.remove('hidden');
+            page2.classList.add('flex');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Trigger grand birthday confetti on entering page 2
+            triggerGrandConfetti();
+            playBirthdayTune();
+        }
+
+        function goToPage1() {
+            document.getElementById('page-2').classList.add('hidden');
+            document.getElementById('page-2').classList.remove('flex');
+            document.getElementById('page-1').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Cake Cutting Logic
+        function triggerCakeCut() {
+            if (isCakeCut) return;
+
+            isCakeCut = true;
+
+            // Visual feedback for cut
+            const line = document.getElementById('cake-cut-line');
+            const knife = document.getElementById('knife');
+            const status = document.getElementById('cut-status');
+            const cakeTop = document.getElementById('cake-top');
+            const cakeBottom = document.getElementById('cake-bottom');
+
+            line.classList.remove('hidden');
+            knife.innerHTML = `<span class="text-2xl">✨</span> <span class="font-playful font-bold text-xs text-emerald-600 uppercase">Slice Cut!</span>`;
+
+            // Extinguish Flames
+            document.getElementById('flame-1').style.display = 'none';
+            document.getElementById('flame-2').style.display = 'none';
+            document.getElementById('flame-3').style.display = 'none';
+
+            // Split Cake slightly
+            cakeTop.style.transform = 'scale(0.98)';
+            cakeBottom.style.transform = 'scale(0.98)';
+
+            status.classList.remove('hidden');
+
+            // Trigger Confetti Explosion
+            triggerGrandConfetti();
+            playBirthdayTune();
+        }
+
+        // Confetti Effects
+        function triggerSoftConfetti() {
+            confetti({
+                particleCount: 30,
+                spread: 60,
+                origin: { y: 0.7 }
+            });
+        }
+
+        function triggerGrandConfetti() {
+            const count = 200;
+            const defaults = { origin: { y: 0.6 } };
+
+            function fire(particleRatio, opts) {
+                confetti(Object.assign({}, defaults, opts, {
+                    particleCount: Math.floor(count * particleRatio)
+                }));
+            }
+
+            fire(0.25, { spread: 26, startVelocity: 55, colors: ['#ff85a2', '#ffaa00'] });
+            fire(0.2, { spread: 60, colors: ['#ffffff', '#ff6289'] });
+            fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+            fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+            fire(0.1, { spread: 120, startVelocity: 45 });
+        }
+
+        // Secret Gift Modal
+        function openGiftModal() {
+            document.getElementById('gift-modal').classList.remove('hidden');
+            triggerGrandConfetti();
+        }
+
+        function closeGiftModal() {
+            document.getElementById('gift-modal').classList.add('hidden');
+        }
+
+        // Web Audio Synthesizer Melody (Happy Birthday Tune)
+        function playBirthdayTune() {
+            if (isPlayingMusic) return;
+
+            try {
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+
+                isPlayingMusic = true;
+                document.getElementById('bgm-icon').className = "fas fa-volume-up text-xl text-pink-600 animate-pulse";
+
+                // Simple Melody Notes for Happy Birthday
+                const notes = [
+                    { note: 261.63, duration: 0.3 }, // C4
+                    { note: 261.63, duration: 0.3 }, // C4
+                    { note: 293.66, duration: 0.5 }, // D4
+                    { note: 261.63, duration: 0.5 }, // C4
+                    { note: 349.23, duration: 0.5 }, // F4
+                    { note: 329.63, duration: 0.8 }, // E4
+                ];
+
+                let currentTime = audioContext.currentTime;
+
+                notes.forEach((item) => {
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(item.note, currentTime);
+
+                    gain.gain.setValueAtTime(0.2, currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, currentTime + item.duration);
+
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+
+                    osc.start(currentTime);
+                    osc.stop(currentTime + item.duration);
+
+                    currentTime += item.duration + 0.1;
+                });
+
+                setTimeout(() => {
+                    isPlayingMusic = false;
+                    document.getElementById('bgm-icon').className = "fas fa-music text-xl";
+                }, (currentTime - audioContext.currentTime) * 1000);
+
+            } catch (e) {
+                console.log("Audio play blocked or unsupported context", e);
+            }
+        }
+
+        // Setup Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+
+            // Toggle BGM manually
+            document.getElementById('bgm-toggle').addEventListener('click', () => {
+                playBirthdayTune();
+            });
+        });
+    </script>
+</body>
+</html>
